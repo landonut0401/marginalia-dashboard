@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ledger: your IB grade dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F2F6;--surface:#FFF;--ink:#211B33;--muted:#6B6580;--line:#DAD6E4;--plum:#5B3A6B;--sage:#3F7A55;--brass:#A9833F;--tint:#E9E4F0;--bad:#B5485A;--warn:#A8741A;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0)}
+@media (prefers-color-scheme:dark){:root{--bg:#17131F;--surface:#221D2E;--ink:#EEEAF5;--muted:#A49DB8;--line:#3A3349;--plum:#B692CC;--sage:#7FBF98;--brass:#D2AE6C;--tint:#2D2640;--bad:#E0788A;--warn:#E0B25A}}
+[hidden]{display:none!important}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 'DM Sans',system-ui,sans-serif}
+body.read{font:400 18px/1.75 'Atkinson Hyperlegible',sans-serif}body.read h1,body.read h2,body.read h3,body.read .brand{font-family:'Atkinson Hyperlegible',sans-serif;font-weight:700}
+h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;margin:0;line-height:1.05}
+input,select,button,textarea{font-family:inherit}:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 60px}
+.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;z-index:9;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:20px 0 6px}
+.brand{font:italic 600 28px 'Cormorant Garamond',Georgia,serif}.brand small{font:400 13px 'DM Sans',sans-serif;color:var(--muted);margin-left:8px;font-style:normal}
+nav{display:flex;gap:16px;flex-wrap:wrap}nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font:500 14px 'DM Sans',sans-serif;cursor:pointer;padding:6px 0}
+nav button[aria-pressed=true]{color:var(--ink);border-color:var(--brass)}
+h2.t{font-size:clamp(34px,5vw,54px);margin:22px 0 4px}.sub{color:var(--muted);margin:0 0 18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin-top:16px}.card h3{font-size:26px;margin-bottom:10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:16px}.stats .card{margin:0;padding:14px 16px}
+.stat span{font-size:12.5px;color:var(--muted);display:block}.stat b{font:500 36px/1.1 'Cormorant Garamond',Georgia,serif;display:block;margin:3px 0}.stat small{font-size:12px;color:var(--muted)}
+.g2{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.g2b{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.none{color:var(--muted);font-size:14px;margin:6px 0}
+.chip{display:inline-block;border-radius:999px;padding:2px 11px;font-size:12.5px;font-weight:600;border:1px solid var(--line)}
+.ok{color:var(--sage);border-color:var(--sage)}.mid{color:var(--warn);border-color:var(--warn)}.low{color:var(--bad);border-color:var(--bad)}
+form label,.f label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:9px 11px;font-size:15px;margin-top:4px}
+input[type=checkbox],input[type=radio]{width:auto;margin:0 6px 0 0}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.pri{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:10px 22px;font-weight:600;font-size:14px;cursor:pointer;margin-top:14px;width:auto}
+.ghost{background:none;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:7px 16px;font-size:13.5px;cursor:pointer;width:auto;margin:8px 8px 0 0}
+.x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;width:auto;padding:0 6px}
+.modes{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.modes label{margin:0;border:1px solid var(--line);border-radius:999px;padding:5px 14px;cursor:pointer;color:var(--ink);font-size:14px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14.5px}th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:12.5px;color:var(--muted);font-weight:600}
+tr.go{cursor:pointer}tr.go:hover{background:var(--tint)}
+.bar{position:relative;height:10px;background:var(--tint);border-radius:9px;margin:5px 0 12px}.bar i{display:block;height:100%;border-radius:9px;background:var(--plum)}.bar b{position:absolute;top:-4px;width:3px;height:18px;background:var(--brass);border-radius:2px}
+.bl{display:flex;justify-content:space-between;font-size:14px;gap:8px}.bl span:last-child{color:var(--muted);font-size:13px}
+ul.ins{margin:0;padding-left:20px}ul.ins li{margin:6px 0}
+.srow{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.srow label{flex:1;margin:0;color:var(--ink);font-size:14.5px}.srow select{width:auto;margin:0}
+.lg{font-size:12.5px;color:var(--muted);margin-top:4px}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;max-width:92vw}.toast.on{opacity:1}
+@media (max-width:800px){.g2,.g2b{grid-template-columns:1fr}.row{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#view">Skip to content</a>
+<div class="wrap">
+<header class="top"><div class="brand">Ledger<small>IB grade dashboard</small></div>
+<nav id="nav" aria-label="Sections"><button data-v="ov">Overview</button><button data-v="sb">Subjects</button><button data-v="ad">Add score</button><button data-v="gl">Goals</button><button data-v="st">Settings</button><button id="theme" aria-label="Toggle easy-read text" aria-pressed="false">Aa</button></nav></header>
+<main id="view" tabindex="-1"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ---------- data and settings ---------- */
+const MYPL=["Language & literature","Language acquisition","Individuals & societies","Sciences","Mathematics","Arts","Design","Physical & health education"];
+const DPL=["English A: Literature","English A: Language & Literature","Spanish B","French B","Hindi B","German B","History","Geography","Economics","Business Management","Psychology","Biology","Chemistry","Physics","Computer Science","Maths: Analysis & Approaches","Maths: Applications & Interpretation","Visual Arts","Music","Theatre"];
+const TYPES=[["Formative (FA)",1],["Summative (SA)",2],["Internal assessment",2],["Mock exam",3],["Final exam",4],["Paper practice",3],["Quiz",.5]];
+const KEY="ledger:v1",DEFB=[80,70,60,50,40,30];
+let S=null,V="ov",DETAIL=null;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+const $=s=>document.querySelector(s),uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("Could not save in this browser")}};
+const r1=n=>Math.round(n*10)/10,today=()=>new Date().toISOString().slice(0,10),dpOn=()=>S&&S.grade>=11;
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2600)}
+function defExam(g){const n=new Date(),y=n.getFullYear()+(n.getMonth()>=5?1:0);return(y+Math.max(0,(g>=11?12:10)-g))+"-05-15"}
+
+/* ---------- grade maths (all editable boundaries live in S.b) ---------- */
+const lo=g=>g<=1?0:S.b[7-g],hi=g=>g>=7?100:lo(g+1),mid=g=>(lo(g)+hi(g))/2;
+const gradeOf=p=>{for(let g=7;g>=2;g--)if(p>=lo(g))return g;return 1};
+const wavg=a=>{const w=a.reduce((x,i)=>x+i.w,0);return w?a.reduce((x,i)=>x+i.w*i.pct,0)/w:null};
+function stats(sub){const it=S.items.filter(i=>i.sub===sub.id).sort((a,b)=>a.d.localeCompare(b.d)),W=it.reduce((a,i)=>a+i.w,0),avg=wavg(it);
+ return{it,W,avg,g:avg==null?null:gradeOf(avg),tr:it.length>=4?wavg(it.slice(-2))-wavg(it.slice(-4,-2)):null}}
+function overall(){const rows=S.subjects.map(s=>({s,...stats(s)})),have=rows.filter(r=>r.avg!=null),dp=dpOn();
+ const avg=have.length?have.reduce((a,r)=>a+r.avg,0)/have.length:null,gs=have.map(r=>r.g).sort((a,b)=>b-a),lvl=gs.length?gs.reduce((a,b)=>a+b,0)/gs.length:null;
+ const srt=[...have].sort((a,b)=>b.avg-a.avg);let pts=null,est=false;
+ if(gs.length){if(gs.length>=6)pts=gs.slice(0,6).reduce((a,b)=>a+b,0);else{pts=Math.round(lvl*6);est=true}pts+=S.bonus||0}
+ return{rows,have,avg,lvl,pts,est,dp,best:srt[0],worst:srt.length>1?srt[srt.length-1]:null}}
+const targetAvg=()=>dpOn()?Math.min(7,Math.max(1,(S.target-(S.bonus||0))/6)):S.target;
+const targetPct=()=>mid(Math.round(Math.min(7,Math.max(1,targetAvg()))));
+const need=(sub,tg,n,w)=>{const st=stats(sub);return(lo(tg)*(st.W+n*w)-(st.avg||0)*st.W)/(n*w)};
+function series(){let sw=0,sp=0;return[...S.items].sort((a,b)=>a.d.localeCompare(b.d)).map(i=>{sw+=i.w;sp+=i.w*i.pct;return{d:i.d,v:sp/sw}})}
+function status(o){if(o.pts==null)return["No data yet","mid"];const d=dpOn()?o.pts-S.target:(o.lvl-S.target)*6;return d>=0?["On track","ok"]:d>=-2.5?["Close","mid"]:["Behind","low"]}
+function projPts(o){return o.pts!=null?o.pts:null}
+
+/* ---------- charts ---------- */
+function trend(){const p=series();if(!p.length)return'<p class="none">Log a score to start your graph.</p>';
+ const t0=Date.parse(p[0].d),ex=Date.parse(S.exam)||Date.parse(defExam(S.grade)),tE=Math.max(ex,Date.parse(p[p.length-1].d)+12096e5),W=640,H=270,l=34,r=30,t=12,b=24;
+ const x=ms=>l+(ms-t0)/((tE-t0)||1)*(W-l-r),y=v=>t+(100-v)/100*(H-t-b),tp=targetPct();let g="";
+ for(let k=7;k>=2;k--)g+=`<line x1="${l}" x2="${W-r}" y1="${y(lo(k))}" y2="${y(lo(k))}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${W-r+5}" y="${y(lo(k))+4}" font-size="11" fill="var(--muted)">${k}</text>`;
+ [0,50,100].forEach(v=>g+=`<text x="${l-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}%</text>`);
+ g+=`<line x1="${x(t0)}" y1="${y(p[0].v)}" x2="${x(tE)}" y2="${y(tp)}" stroke="var(--brass)" stroke-width="2" stroke-dasharray="7 5"/><circle cx="${x(tE)}" cy="${y(tp)}" r="5" fill="var(--brass)"><title>Target: about ${r1(tp)}%</title></circle>`;
+ g+=`<polyline fill="none" stroke="var(--plum)" stroke-width="2.6" points="${p.map(q=>x(Date.parse(q.d))+","+y(q.v)).join(" ")}"/>`+p.map(q=>`<circle cx="${x(Date.parse(q.d))}" cy="${y(q.v)}" r="4" fill="var(--plum)"><title>${q.d}: ${r1(q.v)}% running average</title></circle>`).join("");
+ g+=`<text x="${l}" y="${H-6}" font-size="11" fill="var(--muted)">${p[0].d}</text><text x="${W-r}" y="${H-6}" text-anchor="end" font-size="11" fill="var(--muted)">${new Date(tE).toISOString().slice(0,10)}</text>`;
+ const last=p[p.length-1],idl=p[0].v+(tp-p[0].v)*((Date.parse(last.d)-t0)/((tE-t0)||1));
+ return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Running average score over time compared with the ideal path to your target" style="width:100%;height:auto">${g}</svg><p class="lg"><b style="color:var(--plum)">&#9644;</b> your running average &nbsp; <b style="color:var(--brass)">- -</b> ideal path to your target &nbsp; grade lines 2 to 7 on the right</p><p class="none">${last.v>=idl?"You are "+r1(last.v-idl)+" points ahead of the ideal path.":"You are "+r1(idl-last.v)+" points behind the ideal path."}</p>`}
+function spark(v){if(v.length<2)return"";const w=84,h=22,mn=Math.min(...v),mx=Math.max(...v),s=mx-mn||1;return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline fill="none" stroke="var(--plum)" stroke-width="2" points="${v.map((q,i)=>(i/(v.length-1)*(w-4)+2)+","+(h-3-(q-mn)/s*(h-6))).join(" ")}"/></svg>`}
+const arrow=t=>t==null?"–":t>=3?"▲":t<=-3?"▼":"►";
+const lvl=s=>dpOn()&&s.level?` <small class="none">${s.level}</small>`:"";
+
+/* ---------- views ---------- */
+function vOv(){const o=overall(),st=status(o),dp=dpOn(),pp=projPts(o);
+ const card=(l,v,s)=>`<div class="card stat"><span>${l}</span><b>${v}</b><small>${s}</small></div>`;
+ let h=`<h2 class="t">Hello, ${esc(S.name||"there")}</h2><p class="sub">${dp?"Diploma Programme, grade "+S.grade+" (DP "+(S.grade-10)+")":"Middle Years Programme, grade "+S.grade+" (MYP "+(S.grade-5)+")"} · goal ${dp?S.target+" points":"average grade "+S.target} · <span class="chip ${st[1]}">${st[0]}</span></p><div class="stats">`+
+ card("Average score",o.avg==null?"–":r1(o.avg)+"%",S.items.length+" scores logged")+
+ card(dp?"Predicted IB points":"Average level",o.pts==null?"–":dp?o.pts:r1(o.lvl),dp?(o.est?"estimate from "+o.have.length+" subject(s) · out of 45":"best 6 + "+(S.bonus||0)+" core · out of 45"):"out of 7")+
+ card("Strongest subject",o.best?esc(o.best.s.name):"–",o.best?r1(o.best.avg)+"% · grade "+o.best.g:"Log scores to see")+
+ card("Needs attention",o.worst?esc(o.worst.s.name):"–",o.worst?r1(o.worst.avg)+"% · grade "+o.worst.g:"Needs 2+ subjects")+`</div>`;
+ h+=`<div class="g2"><div class="card"><h3>Progress and ideal path</h3>${trend()}</div><div class="card"><h3>Subjects vs your targets</h3>`+
+  (o.rows.map(r=>`<div class="bl"><span>${esc(r.s.name)}${lvl(r.s)}</span><span>${r.g==null?"no scores":"grade "+r.g+" of target "+r.s.target}</span></div><div class="bar" role="img" aria-label="${esc(r.s.name)}: ${r.g||0} of 7, target ${r.s.target}"><i style="width:${(r.g||0)/7*100}%"></i><b style="left:calc(${r.s.target/7*100}% - 1px)"></b></div>`).join("")||'<p class="none">Add your subjects in Settings.</p>')+`</div></div>`;
+ const a=[];
+ if(o.best)a.push(`Your strongest subject is <b>${esc(o.best.s.name)}</b> at ${r1(o.best.avg)}%.`);
+ if(o.worst)a.push(`<b>${esc(o.worst.s.name)}</b> is lowest at ${r1(o.worst.avg)}%. Raising it by one grade adds a point to your total.`);
+ const far=o.have.map(r=>({r,d:r.s.target-r.g})).filter(x=>x.d>0).sort((a,b)=>b.d-a.d)[0];
+ if(far)a.push(`Furthest below target: <b>${esc(far.r.s.name)}</b>, grade ${far.r.g} against a target of ${far.r.s.target}.`);
+ o.have.filter(r=>r.tr!=null&&r.tr>=3).forEach(r=>a.push(`${esc(r.s.name)} is improving (+${r1(r.tr)} points on recent work).`));
+ o.have.filter(r=>r.tr!=null&&r.tr<=-3).forEach(r=>a.push(`${esc(r.s.name)} is slipping (${r1(r.tr)} points on recent work). Worth a closer look.`));
+ if(dp&&o.pts!=null){const d=S.target-o.pts;a.push(d>0?`You are ${d} point${d>1?"s":""} short of your ${S.target}-point goal. That is about +${r1(d/6)} grade in each of your six scoring subjects.`:`You are on or above your ${S.target}-point goal. Keep it steady.`)}
+ S.unis.forEach(u=>{if(pp!=null){const d=u.pts-pp;a.push(d>0?`${esc(u.n)} needs ${u.pts} points: you are ${d} short right now.`:`${esc(u.n)} needs ${u.pts} points: your current prediction meets it.`)}});
+ h+=`<div class="card"><h3>What this means</h3>${a.length?`<ul class="ins">${a.map(x=>`<li>${x}</li>`).join("")}</ul>`:'<p class="none">Add a few scores and your insights will appear here.</p>'}</div>`;
+ return h}
+function vSb(){const o=overall();let h=`<h2 class="t">Subjects</h2><p class="sub">Select a subject to see every score in it.</p><div class="card tw"><table><caption class="none" style="text-align:left">Weighted average per subject</caption><thead><tr><th>Subject</th><th>Average</th><th>Grade</th><th>Target</th><th>Gap</th><th>Trend</th><th>Scores</th><th></th></tr></thead><tbody>`+
+ o.rows.map(r=>{const gap=r.g==null?null:r.s.target-r.g;return`<tr class="go" tabindex="0" data-sub="${r.s.id}"><td>${esc(r.s.name)}${lvl(r.s)}</td><td>${r.avg==null?"–":r1(r.avg)+"%"}</td><td>${r.g||"–"}</td><td>${r.s.target}</td><td>${gap==null?"–":gap>0?'<span class="chip low">-'+gap+"</span>":'<span class="chip ok">on target</span>'}</td><td>${arrow(r.tr)}</td><td>${r.it.length}</td><td>${spark(r.it.map(i=>i.pct))}</td></tr>`}).join("")+`</tbody></table></div>`;
+ const d=DETAIL&&S.subjects.find(s=>s.id===DETAIL);
+ if(d){const st=stats(d);h+=`<div class="card"><h3>${esc(d.name)}</h3>${st.it.length?`<div class="tw"><table><thead><tr><th>Date</th><th>Type</th><th>Score</th><th>%</th><th>Weight</th><th>Note</th><th></th></tr></thead><tbody>`+[...st.it].reverse().map(i=>`<tr><td>${i.d}</td><td>${esc(i.type)}</td><td>${esc(i.raw||"")}</td><td>${r1(i.pct)}%</td><td>${i.w}</td><td>${esc(i.note||"")}</td><td><button class="x" data-del="${i.id}" aria-label="Delete this score">×</button></td></tr>`).join("")+`</tbody></table></div>`:'<p class="none">No scores yet.</p>'}</div>`}
+ return h}
+function vAd(){const sel=S.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+ if(!S.subjects.length)return`<h2 class="t">Add a score</h2><p class="none">Choose your subjects in Settings first.</p>`;
+ const rec=[...S.items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);
+ return`<h2 class="t">Add a score</h2><p class="sub">Enter it however your teacher gave it: marks, a percentage, or an IB grade.</p><div class="g2b"><form class="card" id="fa" style="margin-top:0"><label>Subject<select name="sub">${sel}</select></label><div class="row"><label>Type<select name="type" id="ft">${TYPES.map(t=>`<option>${t[0]}</option>`).join("")}</select></label><label>Date<input type="date" name="d" value="${today()}" required></label></div>
+ <div class="modes" role="radiogroup" aria-label="How was it marked"><label><input type="radio" name="mode" value="marks" checked>Marks</label><label><input type="radio" name="mode" value="pct">Percent</label><label><input type="radio" name="mode" value="grade">IB grade</label></div>
+ <div class="row mm" data-m="marks"><label>Your marks<input name="raw" type="number" min="0" step="any"></label><label>Out of<input name="out" type="number" min="1" step="any" value="100"></label></div>
+ <div class="mm" data-m="pct" hidden><label>Percent<input name="p" type="number" min="0" max="100" step="any"></label></div>
+ <div class="mm" data-m="grade" hidden><label>IB grade<select name="gr">${[7,6,5,4,3,2,1].map(g=>`<option>${g}</option>`).join("")}</select></label></div>
+ <div class="row"><label>Weight<input name="w" id="fw" type="number" min="0.1" step="any" value="1"></label><label>Note (optional)<input name="note" maxlength="80"></label></div><button class="pri" type="submit">Add score</button></form>
+ <div class="card" style="margin-top:0"><h3>Recent scores</h3>${rec.length?`<ul class="ins" style="list-style:none;padding:0">`+rec.map(i=>{const s=S.subjects.find(x=>x.id===i.sub);return`<li class="bl"><span>${esc(s?s.name:"?")}: ${esc(i.type)}</span><span>${r1(i.pct)}% <button class="x" data-del="${i.id}" aria-label="Delete this score">×</button></span></li>`}).join("")+`</ul>`:'<p class="none">Nothing yet.</p>'}<p class="lg">Weight says how much a score counts. Exams usually count more than quizzes, so the defaults follow the type. Change it any time.</p></div></div>`}
+function vGl(){const o=overall(),pp=projPts(o),sel=S.subjects.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("");
+ let h=`<h2 class="t">Goals</h2><p class="sub">How your marks compare with what you need.</p><div class="g2b"><div class="card" style="margin-top:0"><h3>Universities</h3>`+
+ (S.unis.length?S.unis.map(u=>{const d=pp==null?null:u.pts-pp,pc=pp==null?0:Math.min(100,pp/u.pts*100);return`<div class="bl"><span><b>${esc(u.n)}</b>${u.note?" · "+esc(u.note):""}</span><span>${u.pts} pts <button class="x" data-udel="${u.id}" aria-label="Remove ${esc(u.n)}">×</button></span></div><div class="bar"><i style="width:${pc}%;background:${d!=null&&d<=0?"var(--sage)":"var(--plum)"}"></i></div><p class="none" style="margin-top:-6px">${d==null?"Log scores to compare.":d<=0?"Your prediction meets this.":d+" point"+(d>1?"s":"")+" to find: about +"+r1(d/6)+" grade per subject."}</p>`}).join(""):'<p class="none">Add the universities you are aiming for and the points they ask for.</p>')+
+ `<form id="fu"><div class="row"><label>University<input name="n" required maxlength="60"></label><label>Points needed<input name="pts" type="number" min="1" max="45" required></label></div><label>Note (optional)<input name="note" maxlength="60" placeholder="e.g. Law, HL English 6"></label><button class="pri" type="submit">Add university</button></form></div>
+ <div class="card" style="margin-top:0"><h3>What do I need?</h3><div class="f"><label>Subject<select id="wsub">${sel}</select></label><div class="row"><label>Target grade<select id="wg">${[7,6,5,4,3,2].map(g=>`<option>${g}</option>`).join("")}</select></label><label>Next assessments<input id="wn" type="number" min="1" max="20" value="3"></label><label>Weight each<input id="ww" type="number" min="0.1" step="any" value="3"></label></div></div><p id="wout" class="none" role="status"></p><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><h3>What if I score…</h3><div class="row f"><label>Next score (%)<input id="xp" type="number" min="0" max="100" value="75"></label><label>Weight<input id="xw" type="number" min="0.1" step="any" value="3"></label></div><p id="xout" class="none" role="status"></p></div></div>`;
+ return h}
+function subjRows(g,cur){const L=g>=11?DPL:MYPL,names=[...new Set([...L,...cur.filter(s=>!L.includes(s.name)).map(s=>s.name)])];
+ return names.map(n=>{const c=cur.find(s=>s.name===n);return`<div class="srow"><label><input type="checkbox" name="sc" value="${esc(n)}" ${c?"checked":""}>${esc(n)}</label>${g>=11?`<select name="sl" aria-label="${esc(n)} level"><option ${!c||c.level==="SL"?"selected":""}>SL</option><option ${c&&c.level==="HL"?"selected":""}>HL</option></select>`:""}<select name="st" aria-label="${esc(n)} target grade">${[7,6,5,4,3,2,1].map(x=>`<option value="${x}" ${(c?c.target:6)===x?"selected":""}>Target ${x}</option>`).join("")}</select></div>`}).join("")}
+function vSt(){const f=S||{name:"",grade:11,target:36,bonus:0,exam:defExam(11),b:DEFB,subjects:[],items:[],unis:[]};
+ return`<h2 class="t">${S?"Settings":"Welcome to Ledger"}</h2><p class="sub">${S?"Everything here is saved in this browser only.":"Set up once, then log scores whenever you get them. Your data stays in this browser."}</p><form class="card" id="fs" style="margin-top:0"><div class="row"><label>Your name<input name="name" value="${esc(f.name)}" maxlength="40" required></label><label>Grade<select name="grade" id="sg">${[6,7,8,9,10,11,12].map(g=>`<option value="${g}" ${f.grade===g?"selected":""}>Grade ${g} (${g>=11?"DP "+(g-10):"MYP "+(g-5)})</option>`).join("")}</select></label></div>
+ <div class="row"><label id="tl">${f.grade>=11?"Target IB points (out of 45)":"Target average grade (1 to 7)"}<input name="target" type="number" step="any" min="1" max="45" value="${f.target}" required></label><label>Core points (TOK + EE, 0 to 3)<input name="bonus" type="number" min="0" max="3" value="${f.bonus||0}"></label><label>Final exams date<input name="exam" type="date" value="${f.exam}"></label></div>
+ <h3 style="margin-top:20px">Grade boundaries (percent needed)</h3><p class="lg">Defaults are typical bands. Change them to match your school or your subject's real boundaries.</p><div class="row">${[7,6,5,4,3,2].map((g,i)=>`<label>Grade ${g}<input name="b" type="number" min="1" max="99" value="${f.b[i]}"></label>`).join("")}</div>
+ <h3 style="margin-top:20px">Your subjects</h3><div id="srows">${subjRows(f.grade,f.subjects)}</div><div class="row"><label>Other subject<input name="cn" maxlength="40" placeholder="Type a name"></label><label>Another<input name="cn" maxlength="40"></label></div><button class="pri" type="submit">${S?"Save settings":"Start my dashboard"}</button></form>`+
+ (S?`<div class="card"><h3>Your data</h3><button class="ghost" data-act="json">Download backup (JSON)</button><button class="ghost" data-act="csv">Download scores (CSV)</button><label class="ghost" style="display:inline-block;cursor:pointer">Restore backup<input type="file" accept=".json" id="imp" hidden></label><button class="ghost" data-act="reset" style="color:var(--bad)">Erase everything</button><p class="lg">Nothing leaves your device. Download a backup now and then, because clearing your browser data also clears Ledger.</p></div>`:"")}
+
+/* ---------- render and events ---------- */
+function render(){if(!S)V="st";$("#nav").querySelectorAll("[data-v]").forEach(b=>{b.setAttribute("aria-pressed",b.dataset.v===V);b.disabled=!S&&b.dataset.v!=="st"});
+ $("#view").innerHTML=({ov:vOv,sb:vSb,ad:vAd,gl:vGl,st:vSt})[V]();if(V==="gl"&&S.subjects.length)calc()}
+function go(v){V=v;render();window.scrollTo(0,0)}
+function calc(){const s=S.subjects.find(x=>x.id===$("#wsub").value);if(!s)return;const n=+$("#wn").value||1,w=+$("#ww").value||1,g=+$("#wg").value,nd=need(s,g,n,w),st=stats(s);
+ $("#wout").innerHTML=st.W===0?`To finish on grade ${g} you need about <b>${r1(lo(g))}%</b> on everything.`:nd<=0?`You already hold the ${g} bar. Even 0% on the next ${n} would keep it.`:nd>100?`Grade ${g} is out of reach with only ${n} more assessments. Try more assessments or a lower target.`:`To reach grade ${g} you need about <b>${r1(nd)}%</b> on average across your next ${n} assessments.`;
+ const p=+$("#xp").value,xw=+$("#xw").value||1,nw=st.W+xw,na=((st.avg||0)*st.W+p*xw)/nw;$("#xout").innerHTML=`Your ${esc(s.name)} average would move from ${st.avg==null?"–":r1(st.avg)+"%"} to <b>${r1(na)}%</b> (grade ${gradeOf(na)}).`}
+document.addEventListener("click",e=>{const t=e.target,v=t.closest("[data-v]"),sb=t.closest("[data-sub]"),d=t.closest("[data-del]"),ud=t.closest("[data-udel]"),ac=t.closest("[data-act]");
+ if(v&&!v.disabled)return go(v.dataset.v);
+ if(t.id==="theme"){const on=document.body.classList.toggle("read");t.setAttribute("aria-pressed",on);try{localStorage.setItem("ledger:read",on?"1":"")}catch(x){}return}
+ if(sb){DETAIL=sb.dataset.sub;return render()}
+ if(d){S.items=S.items.filter(i=>i.id!==d.dataset.del);save();render();return toast("Score deleted")}
+ if(ud){S.unis=S.unis.filter(u=>u.id!==ud.dataset.udel);save();return render()}
+ if(ac){const a=ac.dataset.act;
+  if(a==="json")dl("ledger-backup.json",JSON.stringify(S),"application/json");
+  if(a==="csv")dl("ledger-scores.csv",["subject,level,type,date,percent,weight,note",...S.items.map(i=>{const s=S.subjects.find(x=>x.id===i.sub)||{};return[s.name,s.level||"",i.type,i.d,r1(i.pct),i.w,i.note||""].map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(",")})].join("\n"),"text/csv");
+  if(a==="reset"&&confirm("Erase all your scores and settings from this browser?")){S=null;try{localStorage.removeItem(KEY)}catch(x){}go("st")}}});
+document.addEventListener("keydown",e=>{const r=e.target.closest&&e.target.closest("tr[data-sub]");if(r&&(e.key==="Enter"||e.key===" ")){e.preventDefault();DETAIL=r.dataset.sub;render()}});
+function dl(n,txt,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=n;document.body.appendChild(a);a.click();a.remove()}
+document.addEventListener("change",e=>{const t=e.target;
+ if(t.name==="mode"){document.querySelectorAll(".mm").forEach(m=>m.hidden=m.dataset.m!==t.value)}
+ if(t.id==="ft"){const w=TYPES.find(x=>x[0]===t.value);$("#fw").value=w?w[1]:1}
+ if(t.id==="sg"){const g=+t.value;$("#srows").innerHTML=subjRows(g,S?S.subjects.filter(()=>true):[]);$("#tl").firstChild.textContent=g>=11?"Target IB points (out of 45)":"Target average grade (1 to 7)";const ti=document.querySelector('[name=target]');if(!S||(g>=11)!==(S.grade>=11))ti.value=g>=11?36:6;document.querySelector('[name=exam]').value=defExam(g)}
+ if(t.id==="imp"&&t.files[0]){const fr=new FileReader();fr.onload=()=>{try{const j=JSON.parse(fr.result);if(!j||!Array.isArray(j.subjects)||!Array.isArray(j.items)||!Array.isArray(j.b)||j.b.length!==6)throw 0;S=j;S.unis=S.unis||[];save();go("ov");toast("Backup restored")}catch(x){toast("That file is not a Ledger backup")}};fr.readAsText(t.files[0])}});
+document.addEventListener("input",e=>{if(e.target.closest("#view")&&document.querySelector("#wout"))calc()});
+document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,fd=new FormData(f);
+ if(f.id==="fa"){const m=fd.get("mode");let pct,raw="";
+  if(m==="marks"){const a=parseFloat(fd.get("raw")),o=parseFloat(fd.get("out"));if(!(o>0)||isNaN(a)||a<0||a>o)return toast("Marks must be between 0 and the total");pct=a/o*100;raw=a+" / "+o}
+  else if(m==="pct"){pct=parseFloat(fd.get("p"));if(isNaN(pct)||pct<0||pct>100)return toast("Percent must be between 0 and 100");raw=pct+"%"}
+  else{const g=+fd.get("gr");pct=mid(g);raw="Grade "+g}
+  S.items.push({id:uid(),sub:fd.get("sub"),type:fd.get("type"),pct:Math.round(pct*10)/10,w:Math.max(.1,parseFloat(fd.get("w"))||1),d:fd.get("d")||today(),note:String(fd.get("note")||"").slice(0,80),raw});save();DETAIL=fd.get("sub");toast("Score added");return go("ov")}
+ if(f.id==="fu"){S.unis.push({id:uid(),n:String(fd.get("n")).trim(),pts:+fd.get("pts"),note:String(fd.get("note")||"").trim()});save();return render()}
+ if(f.id==="fs"){const b=fd.getAll("b").map(Number);if(b.some((x,i)=>!(x>0)||(i&&x>=b[i-1])))return toast("Boundaries must go down from grade 7 to grade 2");
+  const old=S?S.subjects:[],rows=[...f.querySelectorAll(".srow")],subs=[];
+  rows.forEach(r=>{const c=r.querySelector("[name=sc]");if(c.checked){const n=c.value,o=old.find(s=>s.name===n),lv=r.querySelector("[name=sl]");subs.push({id:o?o.id:uid(),name:n,level:lv?lv.value:"",target:+r.querySelector("[name=st]").value})}});
+  fd.getAll("cn").map(x=>String(x).trim()).filter(Boolean).forEach(n=>{if(!subs.some(s=>s.name===n))subs.push({id:uid(),name:n,level:"",target:6})});
+  const keep=(S?S.items:[]).filter(i=>subs.some(s=>s.id===i.sub)),lost=(S?S.items.length:0)-keep.length;
+  if(lost&&!confirm(lost+" score(s) belong to subjects you unticked and will be deleted. Continue?"))return;
+  const grade=+fd.get("grade");S=Object.assign(S||{items:[],unis:[]},{name:String(fd.get("name")).trim(),grade,target:+fd.get("target"),bonus:Math.min(3,Math.max(0,+fd.get("bonus")||0)),exam:fd.get("exam")||defExam(grade),b,subjects:subs,items:keep});
+  if(!subs.length)toast("Tick at least one subject to see your dashboard");save();toast("Saved");go(subs.length?"ov":"st")}});
+try{if(localStorage.getItem("ledger:read")){document.body.classList.add("read");$("#theme").setAttribute("aria-pressed","true")}}catch(e){}
+render();
+</script>
+</body>
+</html>
